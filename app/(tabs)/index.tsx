@@ -16,6 +16,7 @@ export default function HomeScreen() {
   const [verificationId, setVerificationId] = useState<string | null>(null);
 
   const recaptchaVerifier = useRef<FirebaseRecaptchaVerifierModal>(null);
+  
   const storeToken = async (token: string) => {
     try {
       await SecureStore.setItemAsync('userToken', token);
@@ -77,7 +78,8 @@ export default function HomeScreen() {
         keyboardType="number-pad"
         style={styles.input}
       />
-      <TouchableOpacity style={styles.button} onPress={verifyOTP}>
+      {/**on press = verifyOTP */}
+      <TouchableOpacity style={styles.button} onPress={()=>router.push("/FileUpload")}>
         <Text style={styles.buttonText}>Verify OTP</Text>
       </TouchableOpacity>
     </View>
