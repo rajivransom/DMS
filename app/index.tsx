@@ -106,7 +106,7 @@ const Index = () => {
           />
           <TouchableOpacity
             style={styles.button}
-            onPress={handleGenerateOtp}
+            onPress={()=> router.push("/fileUploads" as any)}
             disabled={loading}
           >
             <Text style={styles.buttonText}>
