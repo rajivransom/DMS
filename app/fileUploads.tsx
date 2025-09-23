@@ -1,6 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -40,6 +42,7 @@ export default function FileUploads() {
   // Date picker
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  
 
   // Major Dropdown
   const [majorOpen, setMajorOpen] = useState(false);
@@ -48,7 +51,7 @@ export default function FileUploads() {
     { label: "Personal", value: "Personal" },
     { label: "Professional", value: "Professional" },
   ]);
-  const authToken="";
+  
 
   // Minor Dropdown
   const [minorOpen, setMinorOpen] = useState(false);
@@ -65,14 +68,27 @@ export default function FileUploads() {
 
   // Files
   const [files, setFiles] = useState<FileType[]>([]);
+  const [authToken, setAuthToken] = useState<string | null>(null);
 
   // Fetch pre-existing tags from API
+  useEffect(() => {
+    const loadToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) setAuthToken(token);
+        else console.warn("No auth token found in storage");
+      } catch (err) {
+        console.error("Error fetching token from storage:", err);
+      }
+    };
+    loadToken();
+  }, []);
   useEffect(() => {
     const fetchTags = async () => {
       try {
         const res = await fetch("https://apis.allsoft.co/api/documentManagement/documentTags", {
           method: "POST",
-          headers: { token: authToken, "Content-Type": "application/json" },
+          headers: {  ...(authToken ? { token: authToken } : {}), "Content-Type": "application/json" },
           body: JSON.stringify({ term: "" }),
         });
         const data = await res.json();
@@ -214,7 +230,7 @@ export default function FileUploads() {
         {
           method: "POST",
           headers: {
-            token: authToken,
+            ...(authToken ? { token: authToken } : {}),
             // IMPORTANT: Do NOT manually set Content-Type.
             // Fetch will handle it automatically for FormData.
           },
@@ -319,8 +335,9 @@ export default function FileUploads() {
         keyExtractor={(item) => item.uri}
         renderItem={({ item }) => <Text style={{ marginVertical: 2 }}>{item.name}</Text>}
       />
+      //handleSubmit
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity style={styles.button} onPress={()=>router.push("/FileSearch")}>
         <Text style={styles.buttonText}>Upload</Text>
       </TouchableOpacity>
     </View>
